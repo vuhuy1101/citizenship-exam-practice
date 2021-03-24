@@ -16,7 +16,7 @@
             <div class="row">
                 <div class="col-12">
                     <h1 id="exam-title">Citizenship exam practice</h1>
-                    <p style="text-align: center;"><small id="msg">Hello world!</small></p>
+                    <p style="text-align: center;">Question complete: <span id="past-question-count">0</span>/100</p>
                 </div>
             </div>
         </div>
@@ -24,17 +24,13 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-12">
+                    <h2 id="complete-text">Congratulations! You're done!</h2>
                     <div id="question-container">
                         <p>Question <span id="question-number">#</span></p>
                         <p id="question"></p>
                         <p id="answer"></p>
                     </div>
                     <input type="text" name="speech-msg" id="speech-msg" x-webkit-speech>
-
-                    <div id="option-container" class="option">
-                        <label for="voice">Voice</label>
-                        <select name="voice" id="voice"></select>
-                    </div>
 
                     <button id="start" class="btn btn-primary">Start Exam</button>
 
@@ -51,7 +47,12 @@
                     </div>
                 </div>
             </div>
-
+                <div class="row">
+                    <div id="option-container" class="option">
+                        <label for="voice">Voice</label>
+                        <select name="voice" id="voice"></select>
+                    </div>
+                </div>
         </div>
     </div>
 
@@ -59,7 +60,7 @@
 
 <script>
     (function(){
-        var supportMsg = document.getElementById('msg');
+        var pastQuestionsCount = document.getElementById('past-question-count');
         // Get the text input element.
         var speechMsgInput = document.getElementById('speech-msg');
         // Get the voice select element.
@@ -70,16 +71,10 @@
         var nextQuestionBtn = document.getElementById('next-question');
         var answer = document.getElementById('answer');
         var questionNumber = document.getElementById('question-number');
+        var completeText = document.getElementById('complete-text');
         var questions = [];
-        var currentQuestion = 0;
+        var currentQuestion = -1;
         var pastQuestions = [];
-
-        if ('speechSynthesis' in window) {
-            supportMsg.innerHTML = 'Your browser <strong>supports</strong> speech synthesis.';
-        } else {
-            supportMsg.innerHTML = 'Sorry your browser <strong>does not support</strong> speech synthesis.<br>Try this in <a href="https://www.google.co.uk/intl/en/chrome/browser/canary.html">Chrome Canary</a>.';
-            supportMsg.classList.add('not-supported');
-        }
 
         // Fetch 100 questions
         fetch("./json/exam.json")
@@ -101,9 +96,9 @@
 
         nextQuestionBtn.addEventListener('click', function(){
             answer.style.display = "none";       
-            getNextQuestion();
             showAnswerBtn.style.display = "block";
             nextQuestionBtn.style.display = "block";
+            getNextQuestion();
             speak(question.innerHTML)
         });
 
@@ -117,14 +112,26 @@
         }
 
         function getNextQuestion() {
+            pastQuestions.push(currentQuestion);
+
             var newQuestion = randomQuestion();
             while (pastQuestions.length < 100 && pastQuestions.includes(newQuestion)) {
                 newQuestion = randomQuestion();
             }
-            currentQuestion = newQuestion;
-            questionNumber.innerHTML = currentQuestion;
-            question.innerHTML = questions[currentQuestion].question;
-            answer.innerHTML = questions[currentQuestion].answer;
+
+            if (pastQuestions.length <= 100) {
+                currentQuestion = newQuestion;
+                questionNumber.innerHTML = currentQuestion;
+                question.innerHTML = questions[currentQuestion].question;
+                answer.innerHTML = questions[currentQuestion].answer;
+                pastQuestionsCount.innerHTML = pastQuestions.length;
+            } else {
+                document.querySelector("#question-container").style.display = "none";
+                showAnswerBtn.style.display = "none";
+                nextQuestionBtn.style.display = "none";
+                completeText.style.display = "block";
+            }
+            
         }
         
         // Get the speak button
@@ -163,23 +170,32 @@
         
         // Loop through each of the voices.
             voices.forEach(function(voice, i) {
-            // Create a new option element.
-                var option = document.createElement('option');
+                if (voice.lang == "en-US") {
+                    // Create a new option element.
+                    var option = document.createElement('option');
             
-            // Set the options value and text.
-                option.value = voice.name;
-                option.innerHTML = voice.name;
-                
-            // Add the option to the voice selector.
-                voiceSelect.appendChild(option);
+                    // Set the options value and text.
+                    option.value = voice.name;
+                    option.innerHTML = voice.name;
+                    
+                    // Add the option to the voice selector.
+                    voiceSelect.appendChild(option);
+                }
             });
         }
 
         loadVoices();
 
+        
+
+        
         window.speechSynthesis.onvoiceschanged = function(e) {
             loadVoices();
         };
+
+        voiceSelect.addEventListener('change', function(){
+            loadVoices();
+        });
 
         // window.addEventListener("load", function(){
             

@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "citizenship exam practice built with Node, React, and Type to Speech",
   "author": "Huy Vu",
-  "license": "Huy Vu",
+  "license": "UNLICENSED",
   "main": "app.js",
   "keywords": [
     "nodejs",
@@ -12,5 +12,17 @@
   ],
   "dependencies": {
     "express": "^4.16.4"
-  }
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vuhuy1101/citizenship-exam-practice.git"
+  },
+  "bugs": {
+    "url": "https://github.com/vuhuy1101/citizenship-exam-practice/issues"
+  },
+  "homepage": "https://github.com/vuhuy1101/citizenship-exam-practice#readme"
 }
