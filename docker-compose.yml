@@ -1,0 +1,10 @@
+version: '2'
+services:
+  web:
+    image: hvu2018/citizenship-exam-practice
+    build:
+      context: .
+    volumes:
+      - .:/home/node/app
+    ports:
+      - '80:8080'

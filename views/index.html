@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>About Sharks</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link href="css/styles.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Merriweather:400,700" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+    <div id="main-container">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h1 id="exam-title">Citizenship exam practice</h1>
+                    <p style="text-align: center;"><small id="msg">Hello world!</small></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div id="question-container">
+                        <p>Question <span id="question-number">#</span></p>
+                        <p id="question"></p>
+                        <p id="answer"></p>
+                    </div>
+                    <input type="text" name="speech-msg" id="speech-msg" x-webkit-speech>
+
+                    <div id="option-container" class="option">
+                        <label for="voice">Voice</label>
+                        <select name="voice" id="voice"></select>
+                    </div>
+
+                    <button id="start" class="btn btn-primary">Start Exam</button>
+
+                    <button id="speak" class="btn btn-primary" style="display: none;">Speak</button>
+                </div>
+                <div class="col-md-12">
+                    <div class="row">
+                        <div class="col-md-5">
+                            <button id="show-answer" class="btn btn-primary">Show answer</button>    
+                        </div>
+                        <div class="col-md-5">
+                            <button id="next-question" class="btn btn-default">Next question</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+
+<script>
+    (function(){
+        var supportMsg = document.getElementById('msg');
+        // Get the text input element.
+        var speechMsgInput = document.getElementById('speech-msg');
+        // Get the voice select element.
+        var voiceSelect = document.getElementById('voice');
+        var question = document.getElementById('question');
+        var startBtn = document.getElementById('start');
+        var showAnswerBtn = document.getElementById('show-answer');
+        var nextQuestionBtn = document.getElementById('next-question');
+        var answer = document.getElementById('answer');
+        var questionNumber = document.getElementById('question-number');
+        var questions = [];
+        var currentQuestion = 0;
+        var pastQuestions = [];
+
+        if ('speechSynthesis' in window) {
+            supportMsg.innerHTML = 'Your browser <strong>supports</strong> speech synthesis.';
+        } else {
+            supportMsg.innerHTML = 'Sorry your browser <strong>does not support</strong> speech synthesis.<br>Try this in <a href="https://www.google.co.uk/intl/en/chrome/browser/canary.html">Chrome Canary</a>.';
+            supportMsg.classList.add('not-supported');
+        }
+
+        // Fetch 100 questions
+        fetch("./json/exam.json")
+            .then(response => {
+                return response.json();
+            })
+            .then(data => {
+                questions = data["list"]
+            });
+
+        
+        startBtn.addEventListener('click', function(){
+            getNextQuestion();
+            startBtn.style.display = "none";
+            showAnswerBtn.style.display = "block";
+            nextQuestionBtn.style.display = "block";
+            speak(question.innerHTML)
+        });
+
+        nextQuestionBtn.addEventListener('click', function(){
+            answer.style.display = "none";       
+            getNextQuestion();
+            showAnswerBtn.style.display = "block";
+            nextQuestionBtn.style.display = "block";
+            speak(question.innerHTML)
+        });
+
+        showAnswerBtn.addEventListener('click', function(){
+            answer.style.display = "block";
+            speak(answer.innerHTML)
+        });
+
+        function randomQuestion(){
+            return Math.floor(Math.random() * 100);
+        }
+
+        function getNextQuestion() {
+            var newQuestion = randomQuestion();
+            while (pastQuestions.length < 100 && pastQuestions.includes(newQuestion)) {
+                newQuestion = randomQuestion();
+            }
+            currentQuestion = newQuestion;
+            questionNumber.innerHTML = currentQuestion;
+            question.innerHTML = questions[currentQuestion].question;
+            answer.innerHTML = questions[currentQuestion].answer;
+        }
+        
+        // Get the speak button
+        // Get the 'speak' button
+        var button = document.getElementById('speak');
+
+        button.addEventListener('click', function(e) {
+            if (speechMsgInput.value.length > 0) {
+                speak(speechMsgInput.value);
+            }
+        });
+
+        // Create a new utterance for the specified text and add it to
+        // the queue.
+        function speak(text) {
+            // Create a new instance of SpeechSynthesisUtterance.
+            var msg = new SpeechSynthesisUtterance();
+        
+            // Set the text.
+            msg.text = text;
+        
+            // If a voice has been selected, find the voice and set the
+            // utterance instance's voice attribute.
+            if (voiceSelect.value) {
+                msg.voice = speechSynthesis.getVoices().filter(function(voice) { return voice.name == voiceSelect.value; })[0];
+            }
+        
+        // Queue this utterance.
+            window.speechSynthesis.speak(msg);
+        }
+
+        // Fetch the list of voices and populate the voice options.
+        function loadVoices() {
+        // Fetch the available voices.
+            var voices = speechSynthesis.getVoices();
+        
+        // Loop through each of the voices.
+            voices.forEach(function(voice, i) {
+            // Create a new option element.
+                var option = document.createElement('option');
+            
+            // Set the options value and text.
+                option.value = voice.name;
+                option.innerHTML = voice.name;
+                
+            // Add the option to the voice selector.
+                voiceSelect.appendChild(option);
+            });
+        }
+
+        loadVoices();
+
+        window.speechSynthesis.onvoiceschanged = function(e) {
+            loadVoices();
+        };
+
+        // window.addEventListener("load", function(){
+            
+        // });
+    })();
+
+
+</script>
+
+</html>

@@ -1,0 +1,63 @@
+body {
+    font-family: 'Merriweather', sans-serif;
+}
+
+h1, h2 {
+    font-weight: bold;
+}
+
+p {
+    font-size: 1rem;
+}
+
+#main-container {
+    padding: 80px 0;
+}
+
+#exam-title {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+#speech-msg {
+    width: 100%;
+    margin-bottom: 2rem;
+}
+
+#option-container {
+    display: none;
+}
+
+.btn {
+    padding: 1rem 3rem;
+}
+
+#speak, #start {
+    padding-left: 20px;
+    padding-right: 20px;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+#speech-msg {
+    display: none;
+}
+
+#question {
+    font-size: 2rem;
+    font-weight: 400;
+}
+
+#show-answer, #next-question, #answer {
+    display: none;
+}
+
+#answer {
+    color: #c92920;
+    font-size: 1.75rem;
+}
+
+#question-container {
+    margin-bottom: 2rem;
+}

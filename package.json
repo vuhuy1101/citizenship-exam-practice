@@ -1,0 +1,16 @@
+{
+  "name": "citizenship-exam-practice",
+  "version": "1.0.0",
+  "description": "citizenship exam practice built with Node, React, and Type to Speech",
+  "author": "Huy Vu",
+  "license": "Huy Vu",
+  "main": "app.js",
+  "keywords": [
+    "nodejs",
+    "bootstrap",
+    "express"
+  ],
+  "dependencies": {
+    "express": "^4.16.4"
+  }
+}
